@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ReadSms:AppCompatActivity() {
@@ -78,7 +79,10 @@ class ReadSms:AppCompatActivity() {
 
                 smsOrigin.text = cursor.getString( cursor.getColumnIndexOrThrow( SmsColumns.ADDRESS) )
                 smsBody.text =  cursor.getString( cursor.getColumnIndexOrThrow(SmsColumns.BODY) )
-                smsDate.text = Date( cursor.getLong( cursor.getColumnIndexOrThrow(SmsColumns.DATE )) ).toString()
+
+                val simpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val dateFormatted = simpleDateFormat.format(cursor.getLong( cursor.getColumnIndexOrThrow(SmsColumns.DATE))).toString()
+                smsDate.text =   dateFormatted
             }
         }
     }
@@ -103,8 +107,6 @@ class ReadSms:AppCompatActivity() {
         )
         mRecyList.layoutManager = layoutManager
         mRecyList.adapter = adapter
-
-        adapter?.notifyDataSetChanged()
     }
 
     override fun onRequestPermissionsResult(

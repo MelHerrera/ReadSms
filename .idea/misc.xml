@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/melkin.herrera.UNAN/AndroidStudioProjects/ReadSms/app/src/main/res/drawable/ic_envelope.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/melkin.herrera.UNAN/AndroidStudioProjects/ReadSms/app/src/main/res/layout/activity_main.xml" value="0.2453125" />
         <entry key="..\:/Users/melkin.herrera.UNAN/AndroidStudioProjects/ReadSms/app/src/main/res/layout/activity_read_sms.xml" value="0.259375" />
         <entry key="..\:/Users/melkin.herrera.UNAN/AndroidStudioProjects/ReadSms/app/src/main/res/layout/item_sms.xml" value="0.259375" />
