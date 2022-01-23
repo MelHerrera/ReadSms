@@ -1,6 +1,5 @@
 package com.example.readsms
 
-import android.app.ListActivity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -19,14 +18,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
-abstract class ReadSms:AppCompatActivity() {
-    abstract var listAdapter: RecyclerView
-    val SMS = Uri.parse("Content://sms")
+class ReadSms:AppCompatActivity() {
+    val SMS = Uri.parse("content://sms")
     val PERMISSIONS_REQUEST_READ_SMS = 1
+    lateinit var mRecyList:RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_read_sms)
+        setContentView(R.layout.activity_read_sms)
+
+        mRecyList = findViewById(R.id.vRecyMessages)
 
         val permissionCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
 
@@ -36,47 +37,19 @@ abstract class ReadSms:AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_SMS), PERMISSIONS_REQUEST_READ_SMS)
     }
 
-    private inner class SmsCursorAdapter(context: Context, c: Cursor, autoRequery: Boolean):
-        CursorAdapter(context, c, autoRequery) {
-        override fun newView(context: Context, cursor: Cursor, viewGroup: ViewGroup): View {
-            return View.inflate(
-                context,
-                R.layout.activity_read_sms,
-                null
-            )
-        }
-
-        override fun bindView(view: View, context: Context, cursor: Cursor) {
-            view.findViewById<TextView>(R.id.sms_origin).text = cursor.getString(
-                cursor.getColumnIndexOrThrow(
-                    SmsColumns.ADDRESS
-                )
-            )
-            view.findViewById<TextView>(R.id.sms_body).text =
-                cursor.getString(cursor.getColumnIndexOrThrow(SmsColumns.BODY))
-            view.findViewById<TextView>(R.id.sms_date).text = Date(
-                cursor.getLong(
-                    cursor.getColumnIndexOrThrow(
-                        SmsColumns.DATE
-                    )
-                )
-            ).toString()
-        }
-    }
-
     private inner class SmsCursorAdapterRecy(private var c: Cursor):
         RecyclerView.Adapter<SmsCursorAdapterRecy.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(
                 LayoutInflater.from(parent.context).inflate(
-                    R.layout.activity_read_sms, parent, false
+                    R.layout.item_sms, parent, false
                 )
             )
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bindView(c)
+            holder.bindView(c, position)
         }
 
         override fun getItemCount(): Int {
@@ -88,7 +61,9 @@ abstract class ReadSms:AppCompatActivity() {
             val smsBody =  view.findViewById<TextView>(R.id.sms_body)
             val smsDate =  view.findViewById<TextView>(R.id.sms_date)
 
-            fun bindView(cursor: Cursor){
+            fun bindView(cursor: Cursor, pos: Int){
+                cursor.moveToPosition(pos)
+
                 smsOrigin.text = cursor.getString( cursor.getColumnIndexOrThrow( SmsColumns.ADDRESS) )
                 smsBody.text =  cursor.getString( cursor.getColumnIndexOrThrow(SmsColumns.BODY) )
                 smsDate.text = Date( cursor.getLong( cursor.getColumnIndexOrThrow(SmsColumns.DATE )) ).toString()
@@ -110,8 +85,8 @@ abstract class ReadSms:AppCompatActivity() {
         )
 
         val adapter = cursor?.let { SmsCursorAdapterRecy(it) }
-        listAdapter.layoutManager = LinearLayoutManager(this)
-        listAdapter.adapter = adapter
+        mRecyList.layoutManager = LinearLayoutManager(this)
+        mRecyList.adapter = adapter
     }
 
     override fun onRequestPermissionsResult(
