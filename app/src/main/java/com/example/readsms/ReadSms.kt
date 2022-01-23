@@ -102,9 +102,6 @@ class ReadSms:AppCompatActivity() {
 
         val adapter = cursor?.let { SmsCursorAdapterRecy(it) }
         val layoutManager = LinearLayoutManager(this)
-        mRecyList.addItemDecoration(
-            DividerItemDecoration( baseContext,  layoutManager.orientation )
-        )
         mRecyList.layoutManager = layoutManager
         mRecyList.adapter = adapter
     }
