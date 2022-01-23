@@ -1,6 +1,5 @@
 package com.example.readsms
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -8,27 +7,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CursorAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.*
 
 class ReadSms:AppCompatActivity() {
     val SMS = Uri.parse("content://sms")
     val PERMISSIONS_REQUEST_READ_SMS = 1
     lateinit var mRecyList:RecyclerView
+    lateinit var mRefresh: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_sms)
 
         mRecyList = findViewById(R.id.vRecyMessages)
+        mRefresh = findViewById(R.id.vSwipeRefresh)
 
+        checkPermissionAndReadSms()//inicialmente cargar los mensajes
+
+        mRefresh.setOnRefreshListener {
+            mRefresh.isRefreshing = true
+            checkPermissionAndReadSms()
+            mRefresh.isRefreshing = false
+        }
+    }
+
+    private fun checkPermissionAndReadSms(){
         val permissionCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
 
         if(permissionCheck == PackageManager.PERMISSION_GRANTED)
@@ -85,8 +97,14 @@ class ReadSms:AppCompatActivity() {
         )
 
         val adapter = cursor?.let { SmsCursorAdapterRecy(it) }
-        mRecyList.layoutManager = LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
+        mRecyList.addItemDecoration(
+            DividerItemDecoration( baseContext,  layoutManager.orientation )
+        )
+        mRecyList.layoutManager = layoutManager
         mRecyList.adapter = adapter
+
+        adapter?.notifyDataSetChanged()
     }
 
     override fun onRequestPermissionsResult(
